@@ -40,6 +40,7 @@ class Category extends StatelessWidget {
         .of(context)
         .push(MaterialPageRoute<Null>(builder: (context) =>
         Scaffold(
+          resizeToAvoidBottomPadding: false,
           appBar: AppBar(
             title: Text(name, style: Theme.of(context).textTheme.display1,),
             centerTitle: true,
