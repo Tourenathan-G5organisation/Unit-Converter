@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
 import './unit.dart';
+import 'api.dart';
 import 'category.dart';
 
 /// Converter screen where users can input amounts to convert.
@@ -89,11 +92,21 @@ class _ConverterScreenState extends State<ConverterScreen> {
     return outputNum;
   }
 
-  void _updateConversion() {
-    setState(() {
-      _convertedValue =
-          _format(_inputValue * (_toValue.conversion / _fromValue.conversion));
-    });
+  Future<void> _updateConversion() async{
+    if (widget.category.name == 'Currency') {
+      final conversion = await Api().convert('currency',
+          _inputValue.toString(), _fromValue.name, _toValue.name);
+      setState(() {
+        _convertedValue = _format(conversion);
+      });
+    }else{
+      // For local units
+      setState(() {
+        _convertedValue =
+            _format(_inputValue * (_toValue.conversion / _fromValue.conversion));
+      });
+    }
+
   }
 
   void _updateInputValue(String input) {
