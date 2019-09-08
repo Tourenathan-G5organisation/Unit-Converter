@@ -11,7 +11,6 @@ import 'converter_screen.dart';
 import 'dart:convert';
 import 'dart:async';
 
-
 final _backgroundColor = Colors.green[100];
 
 /// Category Screen (screen).
@@ -19,7 +18,6 @@ final _backgroundColor = Colors.green[100];
 /// This is the 'home' screen of the Unit Converter. It shows a header and
 /// a list of [Categories].
 ///
-
 
 class CategoryScreen extends StatefulWidget {
   const CategoryScreen();
@@ -30,8 +28,7 @@ class CategoryScreen extends StatefulWidget {
   }
 }
 
-class _CategoryScreenState extends State<CategoryScreen>{
-
+class _CategoryScreenState extends State<CategoryScreen> {
   Category _defaultCategory;
   Category _currentCategory;
   final _categories = <Category>[];
@@ -72,18 +69,28 @@ class _CategoryScreenState extends State<CategoryScreen>{
     }),
   ];
 
-   //We use didChangeDependencies() so that we can
-   //wait for our JSON asset to be loaded in (async).
-    @override
-    Future<void> didChangeDependencies() async {
-      super.didChangeDependencies();
-      // We have static unit conversions located in our
-      // assets/data/regular_units.json
-      if (_categories.isEmpty) {
-        await _retrieveLocalCategories();
-      }
-    }
+  final _iconLocation = <String>[
+    'assets/icons/length.png',
+    'assets/icons/area.png',
+    'assets/icons/volume.png',
+    'assets/icons/mass.png',
+    'assets/icons/mass.png',
+    'assets/icons/time.png',
+    'assets/icons/digital_storage.png',
+    'assets/icons/power',
+  ];
 
+  //We use didChangeDependencies() so that we can
+  //wait for our JSON asset to be loaded in (async).
+  @override
+  Future<void> didChangeDependencies() async {
+    super.didChangeDependencies();
+    // We have static unit conversions located in our
+    // assets/data/regular_units.json
+    if (_categories.isEmpty) {
+      await _retrieveLocalCategories();
+    }
+  }
 
   /// Retrieves a list of [Categories] and their [Unit]s
   Future<void> _retrieveLocalCategories() async {
@@ -95,13 +102,14 @@ class _CategoryScreenState extends State<CategoryScreen>{
     if (data is! Map) {
       throw ('Data retrieved from API is not a Map');
     }
-    var categoryIndex =0;
-    for(var key in data.keys){
-      final List<Unit> units =  data[key].map<Unit>((dynamic data) => Unit.fromJson(data)).toList();
+    var categoryIndex = 0;
+    for (var key in data.keys) {
+      final List<Unit> units =
+          data[key].map<Unit>((dynamic data) => Unit.fromJson(data)).toList();
       var category = Category(
         name: key,
         color: _baseColors[categoryIndex],
-        iconLocation: Icons.cake,
+        iconLocation: _iconLocation[categoryIndex],
         units: units,
       );
       setState(() {
@@ -111,9 +119,9 @@ class _CategoryScreenState extends State<CategoryScreen>{
         _categories.add(category);
       });
       categoryIndex += 1;
-
     }
   }
+
   // Function to call when a [Category] is tapped.
   void _onCategoryTap(Category category) {
     setState(() {
@@ -121,31 +129,43 @@ class _CategoryScreenState extends State<CategoryScreen>{
     });
   }
 
- /// For portrait, we construct a [ListView] from the list of category widgets.
+  /// For portrait, we construct a [ListView] from the list of category widgets.
   Widget _buildCategoryWidgets(Orientation deviceOrientation) {
-   if(deviceOrientation == Orientation.portrait) {
-     return ListView.builder(
-       itemBuilder: (BuildContext context, int index) {
-         return CategoryTile(category: _categories[index],
-             onTap: _onCategoryTap);
-       },
-       itemCount: _categories.length,
-     );
-   }else{
-     return GridView.count(crossAxisCount: 2,
-     childAspectRatio: 3,
-     children: _categories.map((Category cat){
-       return CategoryTile(category: cat, onTap: _onCategoryTap,);}).toList(),);
-   }
+    if (deviceOrientation == Orientation.portrait) {
+      return ListView.builder(
+        itemBuilder: (BuildContext context, int index) {
+          return CategoryTile(
+              category: _categories[index], onTap: _onCategoryTap);
+        },
+        itemCount: _categories.length,
+      );
+    } else {
+      return GridView.count(
+        crossAxisCount: 2,
+        childAspectRatio: 3,
+        children: _categories.map((Category cat) {
+          return CategoryTile(
+            category: cat,
+            onTap: _onCategoryTap,
+          );
+        }).toList(),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-   if(_categories.isEmpty){
-     return Center(child: Container(height: 180, width: 180, child: CircularProgressIndicator(),),);
-   }
+    if (_categories.isEmpty) {
+      return Center(
+        child: Container(
+          height: 180,
+          width: 180,
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
 
-   assert(debugCheckHasMediaQuery(context));
+    assert(debugCheckHasMediaQuery(context));
     final listView = Padding(
       padding: EdgeInsets.only(
         left: 8.0,
@@ -157,7 +177,7 @@ class _CategoryScreenState extends State<CategoryScreen>{
 
     return Backdrop(
       currentCategory:
-      _currentCategory == null ? _defaultCategory : _currentCategory,
+          _currentCategory == null ? _defaultCategory : _currentCategory,
       frontPanel: _currentCategory == null
           ? ConverterScreen(category: _defaultCategory)
           : ConverterScreen(category: _currentCategory),
