@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_udacity/unit.dart';
-import 'converter_screen.dart';
+
 import 'category.dart';
+import 'converter_screen.dart';
 
 final _rowHeight = 100.0;
 final _borderRadius = BorderRadius.circular(_rowHeight / 2);
@@ -21,7 +21,6 @@ class CategoryTile extends StatelessWidget {
     @required this.category,
     @required this.onTap,
   })  : assert(category != null),
-        assert(onTap != null),
         super(key: key);
 
   /// Navigates to the ConverterScreen.
@@ -50,7 +49,8 @@ class CategoryTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.transparent,
+      color:
+      onTap == null ? Color.fromRGBO(50, 50, 50, 0.2) : Colors.transparent,
       child: Container(
         height: _rowHeight,
         child: InkWell(
@@ -59,7 +59,7 @@ class CategoryTile extends StatelessWidget {
             splashColor: category.color['splash'],
             // We can use either the () => function() or the () { function(); }
             // syntax.
-            onTap: () {
+            onTap: (onTap == null)? null :() {
               onTap(category);
             },
             child: Padding(

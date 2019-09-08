@@ -2,15 +2,17 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+
 import './category_tile.dart';
 import './unit.dart';
-import 'category.dart';
-import 'backdrop.dart';
-import 'converter_screen.dart';
-import 'dart:convert';
-import 'dart:async';
 import 'api.dart';
+import 'backdrop.dart';
+import 'category.dart';
+import 'converter_screen.dart';
 
 final _backgroundColor = Colors.green[100];
 
@@ -160,7 +162,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
       return ListView.builder(
         itemBuilder: (BuildContext context, int index) {
           return CategoryTile(
-              category: _categories[index], onTap: _onCategoryTap);
+              category: _categories[index],
+              onTap: (_categories[index].name == 'Currency' && _categories[index].units.isEmpty)? null : _onCategoryTap);
         },
         itemCount: _categories.length,
       );
