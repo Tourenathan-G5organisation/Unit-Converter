@@ -106,13 +106,21 @@ class _CategoryScreenState extends State<CategoryScreen>{
   }
 
  /// For portrait, we construct a [ListView] from the list of category widgets.
-  Widget _buildCategoryWidgets() {
-    return ListView.builder(
-      itemBuilder: (BuildContext context, int index) {
-        return CategoryTile(category: _categories[index],
-        onTap: _onCategoryTap);},
-      itemCount: _categories.length,
-    );
+  Widget _buildCategoryWidgets(Orientation deviceOrientation) {
+   if(deviceOrientation == Orientation.portrait) {
+     return ListView.builder(
+       itemBuilder: (BuildContext context, int index) {
+         return CategoryTile(category: _categories[index],
+             onTap: _onCategoryTap);
+       },
+       itemCount: _categories.length,
+     );
+   }else{
+     return GridView.count(crossAxisCount: 2,
+     childAspectRatio: 3,
+     children: _categories.map((Category cat){
+       return CategoryTile(category: cat, onTap: _onCategoryTap,);}).toList(),);
+   }
   }
 
   /// Returns a list of mock [Unit]s.
@@ -128,13 +136,18 @@ class _CategoryScreenState extends State<CategoryScreen>{
 
   @override
   Widget build(BuildContext context) {
+   if(_categories.isEmpty){
+     return Center(child: Container(height: 180, width: 180, child: CircularProgressIndicator(),),);
+   }
+
+   assert(debugCheckHasMediaQuery(context));
     final listView = Padding(
       padding: EdgeInsets.only(
         left: 8.0,
         right: 8.0,
         bottom: 48.0,
       ),
-      child: _buildCategoryWidgets(),
+      child: _buildCategoryWidgets(MediaQuery.of(context).orientation),
     );
 
     return Backdrop(
