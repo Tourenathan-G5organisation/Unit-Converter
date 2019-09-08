@@ -10,6 +10,7 @@ import 'backdrop.dart';
 import 'converter_screen.dart';
 import 'dart:convert';
 import 'dart:async';
+import 'api.dart';
 
 final _backgroundColor = Colors.green[100];
 
@@ -74,10 +75,10 @@ class _CategoryScreenState extends State<CategoryScreen> {
     'assets/icons/area.png',
     'assets/icons/volume.png',
     'assets/icons/mass.png',
-    'assets/icons/mass.png',
     'assets/icons/time.png',
     'assets/icons/digital_storage.png',
-    'assets/icons/power',
+    'assets/icons/power.png',
+    'assets/icons/currency.png',
   ];
 
   //We use didChangeDependencies() so that we can
@@ -89,6 +90,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
     // assets/data/regular_units.json
     if (_categories.isEmpty) {
       await _retrieveLocalCategories();
+      await _retrieveApiCategories();
     }
   }
 
@@ -122,6 +124,29 @@ class _CategoryScreenState extends State<CategoryScreen> {
     }
   }
 
+  Future<void> _retrieveApiCategories() async {
+    setState(() {
+      _categories.add(Category(name: 'Currency', color: _baseColors.last, units: [], iconLocation: _iconLocation.last));
+    });
+    final jsonUnits = await Api().getUnits('currency');
+    // If the API errors out or we have no internet connection, this category
+    // remains in placeholder mode (disabled)
+    if (jsonUnits != null) {
+      final units = <Unit>[];
+      for (var unit in jsonUnits) {
+        units.add(Unit.fromJson(unit));
+      }
+      setState(() {
+        _categories.removeLast();
+        _categories.add(Category(
+          name: 'Currency',
+          units: units,
+          color: _baseColors.last,
+          iconLocation: _iconLocation.last,
+        ));
+      });
+    }
+  }
   // Function to call when a [Category] is tapped.
   void _onCategoryTap(Category category) {
     setState(() {
