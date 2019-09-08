@@ -1,7 +1,6 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:convert' show utf8, json;
-import 'unit.dart';
+import 'dart:io';
 
 /**
  * APi class used to query data for conversion of one unit to another
@@ -30,14 +29,19 @@ class Api{
   /// Returns a double, which is the converted amount. Returns null on error.
   Future<double> convert(String categoryName, String amount, String unitFrom, String unitTo) async{
     final uri = Uri.https(_url, '$categoryName/convert', {'amount': amount, 'from': unitFrom, 'to': unitTo});
-    final httpRequest = await _httpClient.getUrl(uri);
-    final httpResponse = await httpRequest.close();
-    if(httpResponse.statusCode != HttpStatus.ok){
+    try {
+      final jsonResponse = await _getJson(uri);
+      try{
+        return jsonResponse['conversion'].toDouble();
+      } on Exception catch(e){
+        print('Error: $e $jsonResponse["message"]');
+        return null;
+      }
+      
+    }on Exception catch(e){
+      print('Error: $e');
       return null;
     }
-    final responseBody = await httpResponse.transform(utf8.decoder).join();
-    final jsonResponse = json.decode(responseBody);
-    return jsonResponse['conversion'].toDouble();
 
   }
 

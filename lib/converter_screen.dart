@@ -33,6 +33,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
   List<DropdownMenuItem> _unitMenuItems;
   bool _showValidationError = false;
   final _inputKey = GlobalKey(debugLabel: 'inputText');
+  bool _showErrorOnUI = false;
 
   void _createDropDownMenuItem() {
     var newItems = <DropdownMenuItem>[];
@@ -70,10 +71,12 @@ class _ConverterScreenState extends State<ConverterScreen> {
   }
 
   void _setDefaults() {
-    setState(() {
-      _fromValue = widget.category.units[0];
-      _toValue = widget.category.units[1];
-    });
+    if(!widget.category.units.isEmpty) {
+      setState(() {
+        _fromValue = widget.category.units[0];
+        _toValue = widget.category.units[1];
+      });
+    }
   }
 
   /// Clean up conversion; trim trailing zeros, e.g. 5.500 -> 5.5, 10.0 -> 10
@@ -96,6 +99,12 @@ class _ConverterScreenState extends State<ConverterScreen> {
     if (widget.category.name == 'Currency') {
       final conversion = await Api().convert('currency',
           _inputValue.toString(), _fromValue.name, _toValue.name);
+      if(conversion == null){
+        setState(() {
+          _showErrorOnUI = true; // This indicate an error occured
+        });
+        return;
+      }
       setState(() {
         _convertedValue = _format(conversion);
       });
@@ -193,6 +202,26 @@ class _ConverterScreenState extends State<ConverterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if(widget.category.name == 'Currency' || widget.category.units == null && _showErrorOnUI){
+      return SingleChildScrollView(
+        child: Container(
+          margin: EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(16.0),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(16.0), color: widget.category.color['error'],),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Icon(Icons.error_outline, size: 150.0, color: Colors.white,),
+              Text('Error: Unable to connect, please check your internet connection.',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.headline.copyWith(fontSize: 20.0, color: Colors.white),
+              )
+            ],
+          ),
+        ),
+      );
+    }
     final _input = Padding(
       padding: EdgeInsets.all(16.0),
       child: Column(
