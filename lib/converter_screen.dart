@@ -2,20 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
 import './unit.dart';
+import 'category.dart';
 
 /// Converter screen where users can input amounts to convert.
 
 class ConverterScreen extends StatefulWidget {
-  /// Units for this [Category].
-  final List<Unit> units;
-  final ColorSwatch color;
+  /// The current [Category] for unit conversion.
+  final Category category;
 
   /// This [ConverterRoute] requires the color and units to not be null.
   const ConverterScreen({
-    @required this.units,
-    @required this.color,
-  })  : assert(units != null),
-        assert(color != null);
+    @required this.category,
+  }) : assert(category != null);
 
   @override
   State<StatefulWidget> createState() {
@@ -35,7 +33,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
   void _createDropDownMenuItem() {
 
     var newItems = <DropdownMenuItem>[];
-    for (var unit in widget.units) {
+    for (var unit in widget.category.units) {
       newItems.add(DropdownMenuItem(
         value: unit.name,
         child: Container(
@@ -58,10 +56,20 @@ class _ConverterScreenState extends State<ConverterScreen> {
     _setDefaults();
   }
 
+  @override
+  void didUpdateWidget(ConverterScreen old) {
+    super.didUpdateWidget(old);
+    // We update our [DropdownMenuItem] units when we switch [Categories].
+    if (old.category != widget.category) {
+      _createDropDownMenuItem();
+      _setDefaults();
+    }
+  }
+
   void _setDefaults() {
     setState(() {
-      _fromValue = widget.units[0];
-      _toValue = widget.units[1];
+      _fromValue = widget.category.units[0];
+      _toValue = widget.category.units[1];
     });
   }
 
@@ -109,7 +117,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
   }
 
   Unit _getUnit(String unitName) {
-    return widget.units.firstWhere(
+    return widget.category.units.firstWhere(
           (Unit unit) {
         return unit.name == unitName;
       },
