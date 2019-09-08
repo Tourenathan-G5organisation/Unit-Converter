@@ -29,9 +29,9 @@ class _ConverterScreenState extends State<ConverterScreen> {
   String _convertedValue = '';
   List<DropdownMenuItem> _unitMenuItems;
   bool _showValidationError = false;
+  final _inputKey = GlobalKey(debugLabel: 'inputText');
 
   void _createDropDownMenuItem() {
-
     var newItems = <DropdownMenuItem>[];
     for (var unit in widget.category.units) {
       newItems.add(DropdownMenuItem(
@@ -48,7 +48,7 @@ class _ConverterScreenState extends State<ConverterScreen> {
       _unitMenuItems = newItems;
     });
   }
-  
+
   @override
   void initState() {
     super.initState();
@@ -167,7 +167,10 @@ class _ConverterScreenState extends State<ConverterScreen> {
               value: currentValue,
               items: _unitMenuItems,
               onChanged: onChanged,
-              style: Theme.of(context).textTheme.title,
+              style: Theme
+                  .of(context)
+                  .textTheme
+                  .title,
             ),
           ),
         ),
@@ -184,14 +187,21 @@ class _ConverterScreenState extends State<ConverterScreen> {
         children: <Widget>[
           Directionality(
             child: TextField(
+              key: _inputKey,
               keyboardType: TextInputType.number,
-              style: Theme.of(context).textTheme.display1,
+              style: Theme
+                  .of(context)
+                  .textTheme
+                  .display1,
               onChanged: _updateInputValue,
               decoration: InputDecoration(
                   labelText: "Input",
-                  labelStyle: Theme.of(context).textTheme.display1,
+                  labelStyle: Theme
+                      .of(context)
+                      .textTheme
+                      .display1,
                   errorText:
-                      _showValidationError? "Invalid number entered" : null,
+                  _showValidationError ? "Invalid number entered" : null,
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(0.0))),
             ),
@@ -218,11 +228,17 @@ class _ConverterScreenState extends State<ConverterScreen> {
           InputDecorator(
             child: Text(
               _convertedValue,
-              style: Theme.of(context).textTheme.display1,
+              style: Theme
+                  .of(context)
+                  .textTheme
+                  .display1,
             ),
             decoration: InputDecoration(
               labelText: 'Output',
-              labelStyle: Theme.of(context).textTheme.display1,
+              labelStyle: Theme
+                  .of(context)
+                  .textTheme
+                  .display1,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(0.0),
               ),
@@ -233,18 +249,29 @@ class _ConverterScreenState extends State<ConverterScreen> {
       ),
     );
 
+    final converter = ListView(
+      children: [
+        _input,
+        _arrows,
+        _output,
+      ],
+    );
     return Container(
       child: Padding(
         padding: EdgeInsets.all(16.0),
-        child: Column(
-          children: <Widget>[
-            _input,
-            _arrows,
-            _output,
-          ],
-        ),
+        child: OrientationBuilder(
+            builder: (BuildContext context, Orientation orientation) {
+              if (orientation == Orientation.portrait) {
+                return converter;
+              }
+              else {
+                return Center(
+                  child: Container(width: 450.0, child: converter,),);
+              }
+            }),
+
       ),
     );
   }
-    
+
 }
